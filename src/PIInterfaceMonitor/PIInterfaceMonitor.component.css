@@ -38,3 +38,8 @@
 .head{
   border-bottom: 1px solid black;
 }
+
+.myChartDiv {
+ 
+  max-height: 150px;
+}

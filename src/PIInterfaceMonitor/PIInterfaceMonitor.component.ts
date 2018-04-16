@@ -23,7 +23,17 @@ export class PIInterfaceMonitorComponent implements OnChanges, OnInit {
   interfaceDescription: string;
   interfaceStatus: string;
   statusColour: string[] = ['green', 'red'];
-  lineData: any;
+  lineData1: any = [{x: '16-Apr-2018 00:00:00' , y: 100}, {x: '16-Apr-2018 01:00:00' , y: 15},
+  {x: '16-Apr-2018 02:00:00' , y: 100},
+  {x: '16-Apr-2018 03:00:00' , y: 85},
+  {x: '16-Apr-2018 04:00:00' , y: 100},
+  {x: '16-Apr-2018 05:00:00' , y: 100}];
+  lineData2: any = [{x: '16-Apr-2018 00:00:00' , y: 100}, {x: '16-Apr-2018 01:00:00' , y: 50},
+  {x: '16-Apr-2018 02:00:00' , y: 50},
+  {x: '16-Apr-2018 03:00:00' , y: 50},
+  {x: '16-Apr-2018 04:00:00' , y: 100},
+  {x: '16-Apr-2018 05:00:00' , y: 75}];
+   myLineChart: Chart;
   private trend;
   private trendData;
 
@@ -32,45 +42,45 @@ export class PIInterfaceMonitorComponent implements OnChanges, OnInit {
   }
 
   ngOnInit(): void {
+
+
     let ctx = document.getElementById('canvas');
-    let myLineChart = new Chart(ctx, {
+
+   let myLineChart = new Chart(ctx, {
       type: 'line',
-      data: { labels: ['', '', '', '', '', '', '', '', '', ''],
+      data: {
         datasets: [{
+          label: 'Tag1',
           backgroundColor: '#ff6384',
           foregroundColor: '#ff6384',
-          data: [65,
-            150,
-            600,
-            300,
-            200,
-            150,
-          450,
-        250,
-      150,
-    200,
-  100],
+          data: this.lineData1,
         fill: false,
         lineTension: 0
         }, {
+          label: 'Tag2',
           backgroundColor: '#0000FF',
           foregroundColor: '#0000FF',
-          data: [55,
-            20,
-            100,
-            200,
-            200,
-            350,
-          150,
-        250,
-      150,
-    50,
-  60],
+          data: this.lineData2,
         fill: false,
         lineTension: 0
         }
       ]
       },
+      options: {
+      scales: {
+      xAxes: [{ type: 'time',
+distribution: 'series', ticks: {
+source: 'labels'
+}
+}],
+yAxes: [{
+scaleLabel: {
+display: false,
+labelString: ''
+}
+}]
+}
+    },
     });
   }
   ngOnChanges(changes) {
@@ -95,15 +105,30 @@ export class PIInterfaceMonitorComponent implements OnChanges, OnInit {
     this.trendData = [];
     this.interfaceDescription = '';
     this.interfaceStatus = '';
+
+
     for (let i = 0; i < data.body.length; i++) {
       if (data.body[i].path.indexOf('Description') !== -1) {
         this.interfaceDescription = data.body[i].events[0].value;
       } else if (data.body[i].path.indexOf('PI Status') !== -1) {
        this.interfaceStatus = data.body[i].events[0].value.Value;
-      } else {
-        if (data.body[i].path.indexOf('Trend') !== -1) {
-          this.trendData.push(data.body[i]);
-        } else {
+      } else if (data.body[i].path.includes('PI Point')) {
+          if (data.body[i].path.indexOf('1') !== -1) {
+            for (let j = 0; j < data.body[i].events.length - 1 ; j++ ) {
+            this.trendData['x'] = data.body[i].events[j].timestamp;
+              this.trendData['y'] = data.body[i].events[j].value ;
+              // this.lineData1.push(this.trendData);
+              this.trendData = [];
+            }
+          } else if (data.body[i].path.indexOf('2') !== -1) {
+              for (let j = 0; j < data.body[i].events.length - 1 ; j++ ) {
+              this.trendData['x'] = data.body[i].events[j].timestamp;
+              this.trendData['y'] = data.body[i].events[j].value ;
+              // this.lineData2.push(this.trendData);
+              this.trendData = [];
+              }
+            }
+       } else {
         let label = data.body[i].path.split('|', 2)[1];
         this.labels.push(label);
         if (label === 'EnumerationValue') {
@@ -115,9 +140,8 @@ export class PIInterfaceMonitorComponent implements OnChanges, OnInit {
           }
       }
     }
-
-    }
     this.buildInterface(this.labels, this.values);
+
   }
 
   private buildInterface(labels, values) {
@@ -135,42 +159,5 @@ export class PIInterfaceMonitorComponent implements OnChanges, OnInit {
 
   private isDataValid(): boolean {
     return this.data && this.data.body && this.data.body.length;
-  }
-
-  private initTrend(chartType: string) {
-    let ctx = this.elRef.nativeElement.querySelector('canvas');
-
-    if (this.trend) {
-      this.trend.destroy();
-    }
-
-    this.trend = new Chart(ctx, {
-      type: chartType,
-      options: {
-        title: {
-          display: false,
-          text: ''
-        },
-        maintainAspectRatio: true,
-        data: this.trendData ,
-      }
-    });
-
-  }
-private updateTrendData(data) {
-if (this.trend && data.body.headers && data.body.events ) {
-
-}
-}
-  private formatInfo() {
-    let output = '';
-    this.data.body.forEach(item => {
-      output += item.path + '\n';
-      output += item.timestamp + '\n';
-      output += item.type + '\n';
-      output += (item.good ? 'good' : 'bad') + ' data\n------------\n';
-    });
-
-    return output;
-  }
+ }
 }

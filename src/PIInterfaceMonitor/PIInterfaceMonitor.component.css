@@ -1,0 +1,40 @@
+
+:host {
+  display: inline-block;
+}
+
+.items, .top, :host {
+  width: 100%;
+  height: 100%;
+}
+
+.items {
+  font-size: 16pt;
+  overflow: auto;
+  padding: 5px;
+}
+
+.container{
+  border: 1px solid black;
+  border-radius: 10pt;
+  overflow:auto;
+}
+.interfaceValue{
+  text-align: left;
+
+}
+.interfaceName{
+  border-right: 1px solid black;
+  padding-right: 30%;
+}
+.interfaceData{
+  border-bottom: 1px solid black;
+  width: 100%;
+}
+
+.interfaceTable{
+  width:  100%;
+}
+.head{
+  border-bottom: 1px solid black;
+}

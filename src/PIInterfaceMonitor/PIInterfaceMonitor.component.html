@@ -1,0 +1,27 @@
+<div class="top" [style.background]="bkColor">
+  <div class="container">
+    <table class="interfaceTable">
+    <tbody style="width:100%">
+      <tr class="head">
+        <td>
+          {{interfaceDescription}}
+        </td>
+        <td style="height:100%">
+          <svg style="height:100%" height="50px" width="50px" viewbox="0 0 100 100">
+            <circle cx="22" cy="22" r="11" stroke="black" stroke-width="1" attr.fill="{{statusColour[interfaceStatus]}}"></circle>
+          </svg>
+        </td>
+      </tr>
+        <tr class="interfaceData" *ngFor="let interface of interface">
+            <td class="interfaceName">
+              {{interface.labelName}}
+            </td>
+            <td class="interfaceValue">
+                {{interface.labelValue}}
+            </td>
+        </tr>
+    </tbody>
+    </table>
+    <canvas [style.background-color] = "bkColor" id='canvas' style="height:150px;width:100%"></canvas>
+    </div>  
+</div>
